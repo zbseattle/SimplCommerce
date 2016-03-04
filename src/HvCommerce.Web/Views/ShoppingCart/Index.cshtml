@@ -1,0 +1,39 @@
+﻿@(Html.Kendo().Grid<HvCommerce.Web.Areas.Client.ViewModels.ShoppingCartListItem>()
+        .Name("gridShoppingCart")
+        .Columns(columns =>
+        {
+            columns.Bound(p => p.CreatedOn);
+            columns.Bound(p => p.ProductName);
+            columns.Bound(p => p.Price);
+            columns.Bound(p => p.Quantity);
+            columns.Bound(p => p.TotalPrice);
+            columns.Bound(p => p.Id)
+                .ClientTemplate(@"<a href='ShoppingCart/Delete/#:Id#' title='Xóa' class='btn btn-danger btn-xs delete'> <span class='glyphicon glyphicon-remove'></span></a>")
+                .Filterable(false).Sortable(false).Title("Actions").Width(150);
+        })
+        .Pageable()
+        .Sortable()
+        .ColumnMenu()
+        .Filterable()
+        .DataSource(dataSource => dataSource
+            .Ajax()
+                .Sort(sort => sort.Add(x => x.CreatedOn).Descending())
+            .Read(read => read.Url(Url.Action("ListAjax","ShoppingCart")))
+        )
+)
+
+@section scripts {
+    <script type="text/javascript">
+        $(function () {
+            $("#gridShoppingCart").on("click", ".delete", function (e) {
+                e.preventDefault();
+                if (confirm("Bạn muốn xóa mục này?")) {
+                    $.post(this.href).success(function () {
+                        var grid = $("#gridShoppingCart").data("kendoGrid");
+                        grid.dataSource.read();
+                    });
+                }
+            });
+        });
+    </script>
+}

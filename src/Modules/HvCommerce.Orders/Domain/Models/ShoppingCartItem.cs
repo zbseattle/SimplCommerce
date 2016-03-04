@@ -6,6 +6,11 @@ namespace HvCommerce.Orders.Domain.Models
 {
     public class ShoppingCartItem : Entity
     {
+        public ShoppingCartItem()
+        {
+            CreatedOn = DateTime.UtcNow;
+        }
+
         public DateTime CreatedOn { get; set; }
 
         public long CreatedById { get; set; }
