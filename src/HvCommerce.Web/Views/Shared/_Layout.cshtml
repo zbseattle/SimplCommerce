@@ -1,11 +1,10 @@
-﻿<!DOCTYPE html>
+﻿
+<!DOCTYPE html>
 <html>
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>@ViewData["Title"] - HvCommerce.Web</title>
-        <link href="~/lib/kendo2016-112/css/kendo.common.min.css" rel="stylesheet" />
-        <link href="~/lib/kendo2016-112/css/kendo.default.min.css" rel="stylesheet" />
         <environment names="Development">
             <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.css"/>
             <link rel="stylesheet" href="~/css/site.css"/>
@@ -22,8 +21,6 @@
         <environment names="Development">
             <script src="~/lib/jquery/jquery.js"></script>
             <script src="~/lib/bootstrap/js/bootstrap.js"></script>
-            <script src="~/lib/kendo2016-112/js/kendo.all.min.js"></script>
-            <script src="~/lib/kendo2016-112/js/kendo.aspnetmvc.min.js"></script>
             <script src="~/js/site.js" asp-append-version="true"></script>
         </environment>
         <environment names="Staging,Production">
@@ -36,11 +33,8 @@
                     asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal">
             
             </script>
-            <script src="~/lib/kendo2016-112/js/kendo.all.min.js"></script>
-            <script src="~/lib/kendo2016-112/js/kendo.aspnetmvc.min.js"></script>
             <script src="~/js/site.min.js" asp-append-version="true"></script>
         </environment>
-
     </head>
     <body>
         <div class="navbar">
@@ -57,7 +51,7 @@
         </div>
         <div class="navbar">
             <div class="container">
-                <hr />
+                
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                         <span class="sr-only">Toggle navigation</span>
@@ -70,6 +64,8 @@
                 <div class="collapse navbar-collapse">
                     @await Component.InvokeAsync("CategoryMenu")
                 </div>
+                <hr />
+                @await Component.InvokeAsync("Breadcrumb")
             </div>
         </div>
         <div class="container body-content">

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.Entity;
 using System.Reflection;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
@@ -7,21 +8,22 @@ using HvCommerce.Core.Domain.Models;
 using HvCommerce.Core.Infrastructure.EntityFramework;
 using HvCommerce.Infrastructure;
 using HvCommerce.Infrastructure.Domain.IRepositories;
+using HvCommerce.Web.RouteConfigs;
 using Microsoft.AspNet.Authentication.Google;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.PlatformAbstractions;
 using Microsoft.Practices.ServiceLocation;
+using Newtonsoft.Json.Serialization;
 
 namespace HvCommerce.Web
 {
     public class Startup
     {
-        private IHostingEnvironment hostingEnvironment;
-    
+        private readonly IHostingEnvironment hostingEnvironment;
+
         public Startup(IHostingEnvironment hostingEnvironment)
         {
             this.hostingEnvironment = hostingEnvironment;
@@ -53,32 +55,42 @@ namespace HvCommerce.Web
             GlobalConfiguration.ConnectionString = Configuration["Data:DefaultConnection:ConnectionString"];
             GlobalConfiguration.ApplicationPath = hostingEnvironment.WebRootPath;
 
-            services.AddIdentity<User, Role>()
+            services.AddIdentity<User, Role>(configure =>
+            {
+                configure.User.RequireUniqueEmail = true;
+                configure.Password.RequiredLength = 8;
+                //define the default page if a call must be [Autorized]
+                configure.Cookies.ApplicationCookie.LoginPath = "/login";
+            })
                 .AddRoleStore<HvRoleStore>()
                 .AddUserStore<HvUserStore>()
                 .AddDefaultTokenProviders();
 
-            services.AddMvc();
-
-            services.AddKendo();
+            services.AddMvc()
+                .AddJsonOptions(
+                    options =>
+                    {
+                        options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                    });
 
             services.AddScoped(f => Configuration);
 
             GlobalConfiguration.Modules.Add(new HvModule { Name = "Core", AssemblyName = "HvCommerce.Core" });
             GlobalConfiguration.Modules.Add(new HvModule { Name = "Orders", AssemblyName = "HvCommerce.Orders" });
 
-            services.AddScoped<HvDbContext, HvDbContext>(f => new HvDbContext(GlobalConfiguration.ConnectionString));
+            services.AddScoped<DbContext, HvDbContext>(f => new HvDbContext(GlobalConfiguration.ConnectionString));
 
             // TODO: break down to new method in new class
             var builder = new ContainerBuilder();
             builder.RegisterGeneric(typeof (Repository<>)).As(typeof (IRepository<>));
             builder.RegisterGeneric(typeof (RepositoryWithTypedId<,>)).As(typeof (IRepositoryWithTypedId<,>));
-            foreach(var module in GlobalConfiguration.Modules)
+            foreach (var module in GlobalConfiguration.Modules)
             {
                 builder.RegisterAssemblyTypes(Assembly.Load(module.AssemblyName)).AsImplementedInterfaces();
             }
-            
+
             builder.Populate(services);
+
             var container = builder.Build();
             ServiceLocator.SetLocatorProvider(() => new AutofacServiceLocatorAdapter(container));
             return container.Resolve<IServiceProvider>();
@@ -113,6 +125,8 @@ namespace HvCommerce.Web
 
             app.UseMvc(routes =>
             {
+                routes.Routes.Add(new GenericRule(routes.DefaultHandler));
+
                 routes.MapRoute(
                     "areaRoute",
                     "{area:exists}/{controller=Home}/{action=Index}/{id?}");

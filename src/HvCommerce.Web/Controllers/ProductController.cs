@@ -1,5 +1,6 @@
 ﻿using System.Data.Entity;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using HvCommerce.Core.ApplicationServices;
 using HvCommerce.Core.Domain.Models;
 using HvCommerce.Infrastructure.Domain.IRepositories;
@@ -15,15 +16,13 @@ namespace HvCommerce.Web.Controllers
         private readonly IMediaService mediaService;
         private readonly IRepository<Product> productRepository;
 
-        public ProductController(IRepository<Product> productRepository, IMediaService mediaService,
-            IRepository<Category> categoryRepository)
+        public ProductController(IRepository<Product> productRepository, IMediaService mediaService, IRepository<Category> categoryRepository)
         {
             this.productRepository = productRepository;
             this.mediaService = mediaService;
             this.categoryRepository = categoryRepository;
         }
 
-        [Route("category/{catSeoTitle}")]
         public IActionResult ProductsByCategory(string catSeoTitle)
         {
             var category = categoryRepository.Query().FirstOrDefault(x => x.SeoTitle == catSeoTitle);
@@ -59,11 +58,11 @@ namespace HvCommerce.Web.Controllers
             return View(model);
         }
 
-        [Route("product/{seoTitle}")]
         public IActionResult ProductDetail(string seoTitle)
         {
             var product = productRepository.Query()
                 .Include(x => x.Medias)
+                .Include(x => x.Variations)
                 .FirstOrDefault(x => x.SeoTitle == seoTitle && x.IsPublished);
             if (product == null)
             {
@@ -74,8 +73,14 @@ namespace HvCommerce.Web.Controllers
             {
                 Id = product.Id,
                 Name = product.Name,
-                Description = product.Description
+                OldPrice = product.OldPrice,
+                Price = product.Price,
+                ShortDescription = product.ShortDescription,
+                Description = product.Description,
+                Specification = product.Specification
             };
+
+            MapProductVariantToProductVm(product, model);
 
             foreach (var mediaViewModel in product.Medias.Select(productMedia => new MediaViewModel
             {
@@ -87,6 +92,30 @@ namespace HvCommerce.Web.Controllers
             }
 
             return View(model);
+        }
+
+        private static void MapProductVariantToProductVm(Product product, ProductDetail model)
+        {
+            foreach (var variation in product.Variations)
+            {
+                var variationVm = new ProductDetailVariation
+                {
+                    Id = variation.Id,
+                    PriceOffset = variation.PriceOffset
+                };
+
+                foreach (var combination in variation.AttributeCombinations)
+                {
+                    variationVm.Attributes.Add(new ProductDetailVariationAttribute
+                    {
+                        AttributeId = combination.AttributeId,
+                        AttributeName = combination.Attribute.Name,
+                        Value = combination.Value
+                    });
+                }
+
+                model.Variations.Add(variationVm);
+            }
         }
     }
 }

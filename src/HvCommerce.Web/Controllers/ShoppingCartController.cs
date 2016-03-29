@@ -1,31 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using HvCommerce.Core.Domain.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Mvc;
 using System.Security.Claims;
+using HvCommerce.Infrastructure.Domain.IRepositories;
 using HvCommerce.Orders.ApplicationServices;
 using HvCommerce.Orders.Domain.Models;
-using HvCommerce.Web.Areas.Client.ViewModels;
-using Microsoft.AspNet.Authorization;
-using Kendo.Mvc.Extensions;
-using Kendo.Mvc.UI;
+using HvCommerce.Web.ViewModels.Manage;
 
-namespace HvCommerce.Web.Areas.Client.Controllers
+namespace HvCommerce.Web.Controllers
 {
     public class ShoppingCartController : Controller
     {
 
         private readonly UserManager<User> _userManager;
-        private readonly IShoppingCartService _shoppingCartService;
+        private readonly IRepositoryWithTypedId<ShoppingCartItem, long> _shoppingCartRepository;
 
         public ShoppingCartController(UserManager<User> userManager,
-            IShoppingCartService shoppingCartService)
+            IRepositoryWithTypedId<ShoppingCartItem, long> shoppingCartRepository)
         {
             _userManager = userManager;
-            _shoppingCartService = shoppingCartService;
+            _shoppingCartRepository = shoppingCartRepository;
         }
 
         //
@@ -36,22 +34,23 @@ namespace HvCommerce.Web.Areas.Client.Controllers
             return View();
         }
 
-        [HttpPost]
-        public async Task<IActionResult> ListAjax([DataSourceRequest] DataSourceRequest request)
+        [HttpGet]
+        public async Task<IActionResult> List()
         {
-            var user = await GetCurrentUserAsync();
-            var shoppingCartItems = _shoppingCartService.FindByUserId(user.Id);
-            var gridData = shoppingCartItems.ToDataSourceResult(
-                request,
-                x => new ShoppingCartListItem()
-                {
-                    Id = x.Id,
-                    ProductName = x.Product.Name,
-                    CreatedOn = x.CreatedOn,
-                    Quantity = x.Quantity,
-                    Price = x.Product.Price
-                });
-            return Json(gridData);
+            var currentUser = await GetCurrentUserAsync();
+            var shoppingCarts = await _shoppingCartRepository.Query()
+                .Where(x => x.CreatedById == currentUser.Id).ToListAsync();
+            var shoppingCartListItems = shoppingCarts.Select(x => 
+            new ShoppingCartListItemViewModel()
+            {
+                Id = x.Id,
+                Price = x.Product.Price,
+                Quantity = x.Quantity,
+                CreatedOn = x.CreatedOn.ToString(),
+                ProductName = x.Product.Name
+            });
+
+            return Json(shoppingCartListItems);
         }
 
         [HttpGet]
@@ -68,10 +67,9 @@ namespace HvCommerce.Web.Areas.Client.Controllers
                 CreatedById = user.Id,
                 ProductVariationId = 0,
                 Quantity = 1,
+                CreatedOn = DateTime.UtcNow,
                 ProductVariation = new ProductVariation()
                 {
-                    Price = 100,
-                    OldPrice = 50,
                     IsAllowOrder = true,
                     DisplayOrder = 1,
                     IsPublished = true,
@@ -79,21 +77,23 @@ namespace HvCommerce.Web.Areas.Client.Controllers
                 }
             };
 
-            _shoppingCartService.Add(shoppingCart);
+            _shoppingCartRepository.Add(shoppingCart);
+            _shoppingCartRepository.SaveChange();
 
             return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
-        public IActionResult Delete(long id)
+        public IActionResult Remove([FromBody] long id)
         {
-            var shoppingCart = _shoppingCartService.Get(id);
+            var shoppingCart = _shoppingCartRepository.Get(id);
             if (shoppingCart == null)
             {
                 return new HttpStatusCodeResult(400);
             }
 
-            _shoppingCartService.Remove(shoppingCart);
+            _shoppingCartRepository.Remove(shoppingCart);
+            _shoppingCartRepository.SaveChange();
             return Json(true);
         }
 

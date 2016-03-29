@@ -9,15 +9,18 @@ using HvCommerce.Orders.Domain.Models;
 
 namespace HvCommerce.Orders.ApplicationServices
 {
-    public class ShoppingCartService : BaseService<ShoppingCartItem>, IShoppingCartService
+    public class ShoppingCartService : IShoppingCartService
     {
-        public ShoppingCartService(IRepositoryWithTypedId<ShoppingCartItem, long> repository) : base(repository)
+        private readonly IRepositoryWithTypedId<ShoppingCartItem, long> _repository;
+
+        public ShoppingCartService(IRepositoryWithTypedId<ShoppingCartItem, long> repository)
         {
+            _repository = repository;
         }
 
         public IEnumerable<ShoppingCartItem> FindByUserId(long userId)
         {
-            return repository.Query().Include(x => x.Product).Where(x => x.CreatedById == userId);
+            return _repository.Query().Include(x => x.Product).Where(x => x.CreatedById == userId);
         }  
     }
 }

@@ -50,9 +50,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ApplicationServices\BaseService.cs" />
-    <Compile Include="ApplicationServices\BaseServiceWithTypeId.cs" />
-    <Compile Include="ApplicationServices\IBaseServiceWithTypeId.cs" />
     <Compile Include="ApplicationServices\IShoppingCartService.cs" />
     <Compile Include="ApplicationServices\ShoppingCartService.cs" />
     <Compile Include="Domain\Models\ShoppingCartItem.cs" />

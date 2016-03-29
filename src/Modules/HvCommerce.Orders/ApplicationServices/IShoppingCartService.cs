@@ -7,7 +7,7 @@ using HvCommerce.Orders.Domain.Models;
 
 namespace HvCommerce.Orders.ApplicationServices
 {
-    public interface IShoppingCartService : IBaseServiceWithTypeId<ShoppingCartItem, long>
+    public interface IShoppingCartService
     {
         IEnumerable<ShoppingCartItem> FindByUserId(long userId);
     }

@@ -1,16 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using HvCommerce.Core.ApplicationServices;
 using HvCommerce.Core.Domain.Models;
 using HvCommerce.Infrastructure;
 using HvCommerce.Infrastructure.Domain.IRepositories;
 using HvCommerce.Web.Areas.Admin.Helpers;
 using HvCommerce.Web.Areas.Admin.ViewModels;
-using Kendo.Mvc.Extensions;
-using Kendo.Mvc.UI;
 using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Mvc;
 using Microsoft.AspNet.Mvc.Rendering;
+using HvCommerce.Web.Extensions;
 
 namespace HvCommerce.Web.Areas.Admin.Controllers
 {
@@ -20,36 +18,26 @@ namespace HvCommerce.Web.Areas.Admin.Controllers
     {
         private readonly IRepository<Category> categoryRepository;
         private readonly ICategoryService categoryService;
+        private readonly IUrlSlugService urlSlugService;
 
-        public CategoryController(IRepository<Category> categoryRepository, ICategoryService categoryService)
+        public CategoryController(IRepository<Category> categoryRepository, ICategoryService categoryService, IUrlSlugService urlSlugService)
         {
             this.categoryRepository = categoryRepository;
             this.categoryService = categoryService;
+            this.urlSlugService = urlSlugService;
         }
 
         public IActionResult List()
         {
-            return View();
-        }
-
-        public IActionResult ListAjax([DataSourceRequest] DataSourceRequest request)
-        {
             var categories = categoryRepository.Query().Where(x => !x.IsDeleted).ToList();
             var categoriesList = CategoryMapper.ToCategoryListItem(categories);
-            var gridData = categoriesList.ToDataSourceResult(request);
+            var gridData = categoriesList;
 
             return Json(gridData);
         }
 
-        public IActionResult Create()
-        {
-            AddCategoryListToForm(-1);
-            var model = new CategoryForm();
-            return View(model);
-        }
-
         [HttpPost]
-        public IActionResult Create(CategoryForm model)
+        public IActionResult Create([FromBody] CategoryForm model)
         {
             if (ModelState.IsValid)
             {
@@ -63,11 +51,13 @@ namespace HvCommerce.Web.Areas.Admin.Controllers
 
                 categoryRepository.Add(category);
                 categoryRepository.SaveChange();
-                return RedirectToAction("List");
-            }
 
-            AddCategoryListToForm(-1);
-            return View(model);
+                urlSlugService.Add(category.SeoTitle, category.Id, "Category");
+                categoryRepository.SaveChange();
+
+                return Ok();
+            }
+            return Json(ModelState.ToDictionary());
         }
 
         public IActionResult Edit(long id)
@@ -95,6 +85,8 @@ namespace HvCommerce.Web.Areas.Admin.Controllers
                 category.ParentId = model.ParentId;
                 category.IsPublished = model.IsPublished;
 
+                urlSlugService.Update(category.SeoTitle, category.Id, "Category");
+
                 categoryRepository.SaveChange();
                 return RedirectToAction("List");
             }
@@ -113,7 +105,9 @@ namespace HvCommerce.Web.Areas.Admin.Controllers
             }
 
             categoryService.Delete(category);
+            urlSlugService.Remove(category.Id, "Category");
             categoryRepository.SaveChange();
+
             return Json(true);
         }
 

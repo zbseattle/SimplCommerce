@@ -2,8 +2,7 @@
 using HvCommerce.Core.Domain.Models;
 using HvCommerce.Infrastructure.Domain.IRepositories;
 using HvCommerce.Web.Areas.Admin.ViewModels;
-using Kendo.Mvc.Extensions;
-using Kendo.Mvc.UI;
+using HvCommerce.Web.Areas.Admin.ViewModels.SmartTable;
 using Microsoft.AspNet.Authorization;
 using Microsoft.AspNet.Mvc;
 
@@ -20,27 +19,22 @@ namespace HvCommerce.Web.Areas.Admin.Controllers
             this.userRepository = userRepository;
         }
 
-        public IActionResult List()
-        {
-            return View();
-        }
-
         [HttpPost]
-        public ActionResult ListAjax([DataSourceRequest] DataSourceRequest request)
+        public ActionResult List([FromBody] SmartTableParam param)
         {
-            var users = userRepository.Query().Where(x => !x.IsDeleted);
+            var query = userRepository.Query().Where(x => !x.IsDeleted);
 
-            var gridData = users.ToDataSourceResult(
-                request,
+            var users = query.ToSmartTableResult(
+                param,
                 user => new UserListItem
-                {
-                    Id = user.Id,
-                    Email = user.Email,
-                    FullName = user.FullName,
-                    CreatedOn = user.CreatedOn
-                });
+                 {
+                     Id = user.Id,
+                     Email = user.Email,
+                     FullName = user.FullName,
+                     CreatedOn = user.CreatedOn
+                 });
 
-            return Json(gridData);
+            return Json(users);
         }
 
         public ActionResult Detail(long id)
