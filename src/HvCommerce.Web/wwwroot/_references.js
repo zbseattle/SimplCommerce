@@ -17,7 +17,6 @@
 /// <reference path="js/shoppingcart/shoppingcart-list.js" />
 /// <reference path="js/shoppingcart/shoppingcart-service.js" />
 /// <reference path="js/site.js" />
-/// <reference path="js/user-app.js" />
 /// <reference path="lib/angular/angular.js" />
 /// <reference path="lib/angular-animate/angular-animate.min.js" />
 /// <reference path="lib/angular-aria/angular-aria.min.js" />

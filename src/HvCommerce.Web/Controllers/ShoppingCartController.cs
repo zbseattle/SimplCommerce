@@ -15,15 +15,14 @@ namespace HvCommerce.Web.Controllers
 {
     public class ShoppingCartController : Controller
     {
-
-        private readonly UserManager<User> _userManager;
-        private readonly IRepositoryWithTypedId<ShoppingCartItem, long> _shoppingCartRepository;
+        private readonly UserManager<User> userManager;
+        private readonly IRepositoryWithTypedId<ShoppingCartItem, long> shoppingCartRepository;
 
         public ShoppingCartController(UserManager<User> userManager,
             IRepositoryWithTypedId<ShoppingCartItem, long> shoppingCartRepository)
         {
-            _userManager = userManager;
-            _shoppingCartRepository = shoppingCartRepository;
+            this.userManager = userManager;
+            this.shoppingCartRepository = shoppingCartRepository;
         }
 
         //
@@ -38,7 +37,7 @@ namespace HvCommerce.Web.Controllers
         public async Task<IActionResult> List()
         {
             var currentUser = await GetCurrentUserAsync();
-            var shoppingCarts = await _shoppingCartRepository.Query()
+            var shoppingCarts = await shoppingCartRepository.Query()
                 .Where(x => x.CreatedById == currentUser.Id).ToListAsync();
             var shoppingCartListItems = shoppingCarts.Select(x => 
             new ShoppingCartListItemViewModel()
@@ -77,8 +76,8 @@ namespace HvCommerce.Web.Controllers
                 }
             };
 
-            _shoppingCartRepository.Add(shoppingCart);
-            _shoppingCartRepository.SaveChange();
+            shoppingCartRepository.Add(shoppingCart);
+            shoppingCartRepository.SaveChange();
 
             return RedirectToAction(nameof(Index));
         }
@@ -86,14 +85,14 @@ namespace HvCommerce.Web.Controllers
         [HttpPost]
         public IActionResult Remove([FromBody] long id)
         {
-            var shoppingCart = _shoppingCartRepository.Get(id);
+            var shoppingCart = shoppingCartRepository.Get(id);
             if (shoppingCart == null)
             {
                 return new HttpStatusCodeResult(400);
             }
 
-            _shoppingCartRepository.Remove(shoppingCart);
-            _shoppingCartRepository.SaveChange();
+            shoppingCartRepository.Remove(shoppingCart);
+            shoppingCartRepository.SaveChange();
             return Json(true);
         }
 
@@ -101,7 +100,7 @@ namespace HvCommerce.Web.Controllers
 
         private async Task<User> GetCurrentUserAsync()
         {
-            return await _userManager.FindByIdAsync(HttpContext.User.GetUserId());
+            return await userManager.FindByIdAsync(HttpContext.User.GetUserId());
         }
 
         #endregion
