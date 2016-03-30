@@ -16,10 +16,10 @@ namespace HvCommerce.Web.Controllers
     public class ShoppingCartController : Controller
     {
         private readonly UserManager<User> userManager;
-        private readonly IRepositoryWithTypedId<ShoppingCartItem, long> shoppingCartRepository;
+        private readonly IRepository<ShoppingCartItem> shoppingCartRepository;
 
         public ShoppingCartController(UserManager<User> userManager,
-            IRepositoryWithTypedId<ShoppingCartItem, long> shoppingCartRepository)
+            IRepository<ShoppingCartItem> shoppingCartRepository)
         {
             this.userManager = userManager;
             this.shoppingCartRepository = shoppingCartRepository;
