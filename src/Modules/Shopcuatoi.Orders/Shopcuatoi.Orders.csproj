@@ -41,11 +41,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApplicationServices\IShoppingCartService.cs" />
+    <Compile Include="ApplicationServices\ShoppingCartService.cs" />
     <Compile Include="Domain\Models\ShoppingCartItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ApplicationServices\" />
     <Folder Include="Infrastructure\" />
   </ItemGroup>
   <ItemGroup>

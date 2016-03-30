@@ -1,0 +1,48 @@
+﻿@{
+    ViewData["Title"] = "Shopping Cart";
+}
+
+<script src="~/lib/angular/angular.js"></script>
+
+<script src="~/js/shoppingcart/shoppingcart-list.js"></script>
+<script src="~/js/shoppingcart/shoppingcart-service.js"></script>
+
+
+<div ng-app="hv.shoppingCart" ng-controller="shoppingCartListCtrl as vm" ng-cloak>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Create On</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Total</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-if="vm.shoppingCartItems.length" ng-repeat="shoppingCartItem in vm.shoppingCartItems">
+            <td>{{shoppingCartItem.createdOn}}</td>
+            <td>{{shoppingCartItem.productName}}</td>
+            <td>{{shoppingCartItem.price}}</td>
+            <td>
+                <span class="border-button" 
+                      ng-click="shoppingCartItem.quantity = shoppingCartItem.quantity - 1">-</span>
+                <span>{{shoppingCartItem.quantity}}</span>
+                <span class="border-button"
+                      ng-click="shoppingCartItem.quantity = shoppingCartItem.quantity + 1">+</span>
+            </td>
+            <td>{{shoppingCartItem.totalPrice}}</td>
+            <td><a ng-click="vm.removeShoppingCartItem(shoppingCartItem)">Remove</a></td>
+        </tr>
+        <tr ng-if="!vm.shoppingCartItems.length">
+            <td colspan="5" class="text-center">
+                No data
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div>
+        <h3>TOTAL: {{vm.totalPrice}}</h3>
+    </div>
+</div>

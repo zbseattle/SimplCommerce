@@ -12,6 +12,8 @@ using Microsoft.Extensions.Logging;
 using Shopcuatoi.Web.ViewModels.Account;
 using Shopcuatoi.Core.Domain.Models;
 using Shopcuatoi.Core.ApplicationServices;
+using Shopcuatoi.Orders.ApplicationServices;
+using Shopcuatoi.Orders.Domain.Models;
 
 namespace Shopcuatoi.Web.Controllers
 {
@@ -23,19 +25,22 @@ namespace Shopcuatoi.Web.Controllers
         private readonly IEmailSender _emailSender;
         private readonly ISmsSender _smsSender;
         private readonly ILogger _logger;
+        private readonly IShoppingCartService shoppingCartService;
 
         public AccountController(
             UserManager<User> userManager,
             SignInManager<User> signInManager,
             IEmailSender emailSender,
             ISmsSender smsSender,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory,
+            IShoppingCartService shoppingCartService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
             _smsSender = smsSender;
             _logger = loggerFactory.CreateLogger<AccountController>();
+            this.shoppingCartService = shoppingCartService;
         }
 
         //
@@ -65,6 +70,13 @@ namespace Shopcuatoi.Web.Controllers
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
+                    if (Request.Cookies.ContainsKey(nameof(ShoppingCartItem.GuestKey)))
+                    {
+                        var guestKey = GetGuestKey();
+                        var currentUser = await GetUserByEmail(model.Email);
+                        shoppingCartService.ChangeGuestKeyToUser(guestKey, currentUser.Id);
+                        Response.Cookies.Delete(nameof(ShoppingCartItem.GuestKey));
+                    }
                     _logger.LogInformation(1, "User logged in.");
                     return RedirectToLocal(returnUrl);
                 }
@@ -454,6 +466,11 @@ namespace Shopcuatoi.Web.Controllers
             return await _userManager.FindByIdAsync(HttpContext.User.GetUserId());
         }
 
+        private async Task<User> GetUserByEmail(string email)
+        {
+            return await _userManager.FindByEmailAsync(email);
+        }
+
         private IActionResult RedirectToLocal(string returnUrl)
         {
             if (Url.IsLocalUrl(returnUrl))
@@ -464,6 +481,15 @@ namespace Shopcuatoi.Web.Controllers
             {
                 return RedirectToAction(nameof(HomeController.Index), "Home");
             }
+        }
+
+        private Guid GetGuestKey()
+        {
+            if (!Request.Cookies.ContainsKey(nameof(ShoppingCartItem.GuestKey)))
+            {
+                return Guid.NewGuid();
+            }
+            return Guid.Parse(Request.Cookies[nameof(ShoppingCartItem.GuestKey)].ToString());
         }
 
         #endregion

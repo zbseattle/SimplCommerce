@@ -37,3 +37,10 @@ li.nav-item-group, li.nav-item-group a {
     background-color: #FFFFFF;
     padding: 0;
 }
+
+/*CUSTOMIZE*/
+
+.border-button {
+    border: 1px solid #ccc;
+    padding: 0 5px;
+}
