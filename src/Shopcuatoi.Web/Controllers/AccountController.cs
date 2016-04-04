@@ -70,13 +70,7 @@ namespace Shopcuatoi.Web.Controllers
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    if (Request.Cookies.ContainsKey(nameof(ShoppingCartItem.GuestKey)))
-                    {
-                        var guestKey = GetGuestKey();
-                        var currentUser = await GetUserByEmail(model.Email);
-                        shoppingCartService.ChangeGuestKeyToUser(guestKey, currentUser.Id);
-                        Response.Cookies.Delete(nameof(ShoppingCartItem.GuestKey));
-                    }
+                    ChangeGuestKeyToUserByUserEmail(model.Email);
                     _logger.LogInformation(1, "User logged in.");
                     return RedirectToLocal(returnUrl);
                 }
@@ -131,6 +125,7 @@ namespace Shopcuatoi.Web.Controllers
                     //await _emailSender.SendEmailAsync(model.Email, "Confirm your account",
                     //    "Please confirm your account by clicking this link: <a href=\"" + callbackUrl + "\">link</a>");
                     await _signInManager.SignInAsync(user, isPersistent: false);
+                    ChangeGuestKeyToUserByUserEmail(user.Email);
                     _logger.LogInformation(3, "User created a new account with password.");
                     return RedirectToAction(nameof(HomeController.Index), "Home");
                 }
@@ -177,10 +172,13 @@ namespace Shopcuatoi.Web.Controllers
                 return RedirectToAction(nameof(Login));
             }
 
+            var email = info.ExternalPrincipal.FindFirstValue(ClaimTypes.Email);
+
             // Sign in the user with this external login provider if the user already has a login.
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false);
             if (result.Succeeded)
             {
+                ChangeGuestKeyToUserByUserEmail(email);
                 _logger.LogInformation(5, "User logged in with {Name} provider.", info.LoginProvider);
                 return RedirectToLocal(returnUrl);
             }
@@ -197,8 +195,7 @@ namespace Shopcuatoi.Web.Controllers
                 // If the user does not have an account, then ask the user to create an account.
                 ViewData["ReturnUrl"] = returnUrl;
                 ViewData["LoginProvider"] = info.LoginProvider;
-                var email = info.ExternalPrincipal.FindFirstValue(ClaimTypes.Email);
-                return View("ExternalLoginConfirmation", new ExternalLoginConfirmationViewModel { Email = email });
+                return View(nameof(ExternalLoginConfirmation), new ExternalLoginConfirmationViewModel { Email = email });
             }
         }
 
@@ -230,6 +227,7 @@ namespace Shopcuatoi.Web.Controllers
                     if (result.Succeeded)
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
+                        ChangeGuestKeyToUserByUserEmail(user.Email);
                         _logger.LogInformation(6, "User created an account using {Name} provider.", info.LoginProvider);
                         return RedirectToLocal(returnUrl);
                     }
@@ -256,7 +254,7 @@ namespace Shopcuatoi.Web.Controllers
                 return View("Error");
             }
             var result = await _userManager.ConfirmEmailAsync(user, code);
-            return View(result.Succeeded ? "ConfirmEmail" : "Error");
+            return View(result.Succeeded ? nameof(ConfirmEmail) : "Error");
         }
 
         //
@@ -281,7 +279,7 @@ namespace Shopcuatoi.Web.Controllers
                 if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
                 {
                     // Don't reveal that the user does not exist or is not confirmed
-                    return View("ForgotPasswordConfirmation");
+                    return View(nameof(ForgotPasswordConfirmation));
                 }
 
                 // For more information on how to enable account confirmation and password reset please visit http://go.microsoft.com/fwlink/?LinkID=532713
@@ -461,12 +459,7 @@ namespace Shopcuatoi.Web.Controllers
             }
         }
 
-        private async Task<User> GetCurrentUserAsync()
-        {
-            return await _userManager.FindByIdAsync(HttpContext.User.GetUserId());
-        }
-
-        private async Task<User> GetUserByEmail(string email)
+        private async Task<User> GetUserByEmailAsync(string email)
         {
             return await _userManager.FindByEmailAsync(email);
         }
@@ -490,6 +483,17 @@ namespace Shopcuatoi.Web.Controllers
                 return Guid.NewGuid();
             }
             return Guid.Parse(Request.Cookies[nameof(ShoppingCartItem.GuestKey)].ToString());
+        }
+
+        private async void ChangeGuestKeyToUserByUserEmail(string email)
+        {
+            if (Request.Cookies.ContainsKey(nameof(ShoppingCartItem.GuestKey)))
+            {
+                var guestKey = GetGuestKey();
+                var currentUser = await GetUserByEmailAsync(email);
+                shoppingCartService.ChangeGuestKeyToUser(guestKey, currentUser.Id);
+                Response.Cookies.Delete(nameof(ShoppingCartItem.GuestKey));
+            }
         }
 
         #endregion
