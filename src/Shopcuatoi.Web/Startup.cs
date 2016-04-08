@@ -13,6 +13,7 @@ using Microsoft.AspNet.Authentication.Facebook;
 using Microsoft.AspNet.Authentication.Google;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
+using Microsoft.Data.Entity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -56,6 +57,11 @@ namespace Shopcuatoi.Web
             GlobalConfiguration.ConnectionString = Configuration["Data:DefaultConnection:ConnectionString"];
             GlobalConfiguration.ApplicationPath = hostingEnvironment.WebRootPath;
 
+            services.AddEntityFramework()
+                .AddSqlServer()
+                .AddDbContext<HvDbContext>(options =>
+                    options.UseSqlServer(Configuration["Data:DefaultConnection:ConnectionString"]));
+
             services.AddIdentity<User, Role>(configure =>
             {
                 configure.User.RequireUniqueEmail = true;
@@ -63,8 +69,7 @@ namespace Shopcuatoi.Web
                 //define the default page if a call must be [Autorized]
                 configure.Cookies.ApplicationCookie.LoginPath = "/login";
             })
-                .AddRoleStore<HvRoleStore>()
-                .AddUserStore<HvUserStore>()
+                .AddEntityFrameworkStores<HvDbContext, long>()
                 .AddDefaultTokenProviders();
 
             services.AddMvc()
@@ -78,8 +83,6 @@ namespace Shopcuatoi.Web
 
             GlobalConfiguration.Modules.Add(new HvModule { Name = "Core", AssemblyName = "Shopcuatoi.Core" });
             GlobalConfiguration.Modules.Add(new HvModule { Name = "Orders", AssemblyName = "Shopcuatoi.Orders" });
-
-            services.AddScoped<DbContext, HvDbContext>(f => new HvDbContext(GlobalConfiguration.ConnectionString));
 
             // TODO: break down to new method in new class
             var builder = new ContainerBuilder();
@@ -110,6 +113,18 @@ namespace Shopcuatoi.Web
             }
             else
             {
+                // For more details on creating database during deployment see http://go.microsoft.com/fwlink/?LinkID=615859
+                try
+                {
+                    using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
+                        .CreateScope())
+                    {
+                        serviceScope.ServiceProvider.GetService<HvDbContext>()
+                             .Database.Migrate();
+                    }
+                }
+                catch { }
+
                 app.UseExceptionHandler("/Home/Error");
             }
 
@@ -131,7 +146,7 @@ namespace Shopcuatoi.Web
 
             app.UseMvc(routes =>
             {
-                routes.Routes.Add(new GenericRule(routes.DefaultHandler));
+               // routes.Routes.Add(new GenericRule(routes.DefaultHandler));
 
                 routes.MapRoute(
                     "areaRoute",

@@ -30,7 +30,7 @@ namespace Shopcuatoi.Web.RouteConfigs
             var urlSlugRepository = context.HttpContext.RequestServices.GetService<IRepository<UrlSlug>>();
 
             // Get the slug that matches.
-            var urlSlug = await urlSlugRepository.Query().FirstOrDefaultAsync(x => x.Slug == requestPath);
+            var urlSlug = await urlSlugRepository.DbSet.FirstOrDefaultAsync(x => x.Slug == requestPath);
 
             // Invoke MVC controller/action
             var oldRouteData = context.RouteData;

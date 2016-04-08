@@ -1,10 +1,10 @@
 ﻿using System;
-using AspNet.Identity.EntityFramework6;
+using Microsoft.AspNet.Identity.EntityFramework;
 using Shopcuatoi.Infrastructure.Domain.Models;
 
 namespace Shopcuatoi.Core.Domain.Models
 {
-    public class User : IdentityUser<long, UserLogin, UserRole, UserClaim>, IEntityWithTypedId<long>
+    public class User : IdentityUser<long>, IEntityWithTypedId<long>
     {
         public User()
         {

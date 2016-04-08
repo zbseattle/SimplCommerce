@@ -18,15 +18,15 @@ namespace Shopcuatoi.Web.Areas.Admin.Controllers
         [HttpPost]
         public IActionResult ResetToSample()
         {
-            // A temporary (hack) solution because the confict verion ef6-7
-            var dbContext = new HvDbContext(GlobalConfiguration.ConnectionString);
-            var commands = ReadAllCommands();
-            foreach (var command in commands)
-            {
-                dbContext.Database.ExecuteSqlCommand(command);
-            }
+            //// A temporary (hack) solution because the confict verion ef6-7
+            //var dbContext = new HvDbContext(GlobalConfiguration.ConnectionString);
+            //var commands = ReadAllCommands();
+            //foreach (var command in commands)
+            //{
+            //    dbContext.Database.ExecuteSqlCommand(command);
+            //}
 
-            CopyImages();
+            //CopyImages();
 
             return Redirect("~/");
         }

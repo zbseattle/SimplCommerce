@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Threading.Tasks;
 using Shopcuatoi.Core.ApplicationServices;
@@ -30,10 +31,13 @@ namespace Shopcuatoi.Web.Controllers
         public IActionResult Index()
         {
             var model = new HomeViewModel();
-            model.FeaturedProducts = productRepository.Query()
+            var products = productRepository.DbSet
+                .Include(x => x.ThumbnailImage)
                 .Where(x => x.IsPublished)
                 .OrderByDescending(x => x.CreatedOn)
-                .Take(4)
+                .Take(4).ToList();
+
+            model.FeaturedProducts = products
                 .Select(x => new ProductListItem
                 {
                     Id = x.Id,

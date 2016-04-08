@@ -37,7 +37,22 @@
         "Microsoft.Net.Http.Headers": "1.0.0-rc1-final",
         "Newtonsoft.Json": "6.0.6",
         "AspNet.Identity.EntityFramework6": "1.0.0-*",
-        "Shopcuatoi.Infrastructure": "1.0.0-*"
+        "Shopcuatoi.Infrastructure": "1.0.0-*",
+        "EntityFramework.Core": "7.0.0-rc1-final",
+        "EntityFramework.MicrosoftSqlServer": "7.0.0-rc1-final",
+        "EntityFramework.Relational": "7.0.0-rc1-final",
+        "Ix-Async": "1.2.5",
+        "Microsoft.Extensions.Caching.Abstractions": "1.0.0-rc1-final",
+        "Microsoft.Extensions.Caching.Memory": "1.0.0-rc1-final",
+        "Microsoft.Extensions.DependencyInjection": "1.0.0-rc1-final",
+        "Microsoft.Extensions.Logging": "1.0.0-rc1-final",
+        "Remotion.Linq": "2.0.1",
+        "System.Collections.Immutable": "1.1.36",
+        "System.Diagnostics.DiagnosticSource": "4.0.0-beta-23516",
+        "System.Diagnostics.Tracing": "4.0.0",
+        "System.Runtime": "4.0.0",
+        "System.Threading": "4.0.0",
+        "Microsoft.AspNet.Identity.EntityFramework": "1.0.0-*"
       }
     }
   }

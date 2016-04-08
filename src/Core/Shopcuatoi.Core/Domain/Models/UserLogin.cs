@@ -1,4 +1,4 @@
-﻿using AspNet.Identity.EntityFramework6;
+﻿using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace Shopcuatoi.Core.Domain.Models
 {
