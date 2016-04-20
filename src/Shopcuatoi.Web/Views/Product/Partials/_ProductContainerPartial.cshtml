@@ -12,7 +12,7 @@
                 <h3>@product.Name</h3>
                 <p>$@product.Price</p>
                 <p>
-                    @Html.ActionLink("Add to cart", "AddToCart", "ShoppingCart", new { productId = @product.Id }, new { @class = "btn btn-primary", role = "button" })
+                    @Html.ActionLink("Add to cart", "LoadProductModal", "Product", new { productId = Model.Id }, new { @class = "modal-link btn btn-primary" })
                     <a href="#" class="btn btn-default" role="button">Button</a>
                 </p>
             </div>

@@ -44,7 +44,7 @@
                     <h3>Price: @Model.Price.ToString("C2")</h3>
                 </div>
                 <div>
-                    <button type="button" class="btn btn-default btn-lg">Add to Cart</button>
+                    @Html.ActionLink("Add to cart", "LoadProductModal", "Product", new { productId = Model.Id }, new { @class = "modal-link btn btn-default btn-lg" })
                     <button type="button" class="btn btn-default btn-lg">Add to Wishlist</button>
                 </div>
             </div>

@@ -27,6 +27,11 @@ namespace Shopcuatoi.Core.Infrastructure.EntityFramework
             DbSet.Add(entity);
         }
 
+        public void Update(T entity)
+        {
+            Context.Entry(entity).State = EntityState.Modified;
+        }
+
         public void SaveChange()
         {
             Context.SaveChanges();

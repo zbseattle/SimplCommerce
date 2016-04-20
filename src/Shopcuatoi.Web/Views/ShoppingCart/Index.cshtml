@@ -24,15 +24,15 @@
         <tr ng-if="vm.shoppingCartItems.length" ng-repeat="shoppingCartItem in vm.shoppingCartItems">
             <td>{{shoppingCartItem.createdOn}}</td>
             <td>{{shoppingCartItem.productName}}</td>
-            <td>{{shoppingCartItem.price}}</td>
+            <td>{{shoppingCartItem.price | currency}}</td>
             <td>
                 <span class="border-button" 
-                      ng-click="shoppingCartItem.quantity = shoppingCartItem.quantity - 1">-</span>
+                      ng-click="vm.decreaseQuantity(shoppingCartItem)">-</span>
                 <span>{{shoppingCartItem.quantity}}</span>
                 <span class="border-button"
-                      ng-click="shoppingCartItem.quantity = shoppingCartItem.quantity + 1">+</span>
+                      ng-click="vm.increaseQuantity(shoppingCartItem)">+</span>
             </td>
-            <td>{{shoppingCartItem.totalPrice}}</td>
+            <td>{{shoppingCartItem.totalPrice | currency}}</td>
             <td><a ng-click="vm.removeShoppingCartItem(shoppingCartItem)">Remove</a></td>
         </tr>
         <tr ng-if="!vm.shoppingCartItems.length">
@@ -43,6 +43,6 @@
         </tbody>
     </table>
     <div>
-        <h3>TOTAL: {{vm.totalPrice}}</h3>
+        <h3>TOTAL: {{vm.totalPrice | currency}}</h3>
     </div>
 </div>

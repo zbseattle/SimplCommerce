@@ -1,26 +1,39 @@
-﻿using System.Data.Entity;
+﻿using System;
+using System.Data.Entity;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
+using System.Threading.Tasks;
+using Microsoft.AspNet.Http;
+using Microsoft.AspNet.Identity;
 using Shopcuatoi.Core.ApplicationServices;
 using Shopcuatoi.Core.Domain.Models;
 using Shopcuatoi.Infrastructure.Domain.IRepositories;
 using Shopcuatoi.Web.ViewModels;
 using Shopcuatoi.Web.ViewModels.Catalog;
 using Microsoft.AspNet.Mvc;
+using Shopcuatoi.Orders.ApplicationServices;
+using Shopcuatoi.Orders.Domain.Models;
 
 namespace Shopcuatoi.Web.Controllers
 {
-    public class ProductController : Controller
+    public class ProductController : BaseController
     {
         private readonly IRepository<Category> categoryRepository;
         private readonly IMediaService mediaService;
         private readonly IRepository<Product> productRepository;
+        private readonly IShoppingCartService shoppingCartService;
 
-        public ProductController(IRepository<Product> productRepository, IMediaService mediaService, IRepository<Category> categoryRepository)
+        public ProductController(IRepository<Product> productRepository, 
+            IMediaService mediaService, 
+            IRepository<Category> categoryRepository,
+            IShoppingCartService shoppingCartService,
+            UserManager<User> userManager
+            ) : base(userManager)
         {
             this.productRepository = productRepository;
             this.mediaService = mediaService;
             this.categoryRepository = categoryRepository;
+            this.shoppingCartService = shoppingCartService;
         }
 
         public IActionResult ProductsByCategory(string catSeoTitle)
@@ -92,6 +105,36 @@ namespace Shopcuatoi.Web.Controllers
             }
 
             return View(model);
+        }
+
+        public async Task<IActionResult> LoadProductModal(long productId)
+        {
+            var product = productRepository.Query()
+                .Include(x => x.Medias)
+                .Include(x => x.Variations)
+                .FirstOrDefault(x => x.Id == productId && x.IsPublished);
+            if (product == null)
+            {
+                return Redirect("~/Error/FindNotFound");
+            }
+
+            var guestKey = GetGuestKey();
+            var user = await GetCurrentUserAsync();
+
+            if (user != null)
+            {
+                shoppingCartService.AddToCartByUser(productId, user.Id);
+            }
+            else
+            {
+                shoppingCartService.AddToCartByGuestKey(productId, guestKey);
+                Response.Cookies.Append(nameof(ShoppingCart.GuestKey), guestKey.ToString(), new CookieOptions()
+                {
+                    Expires = DateTime.MaxValue
+                });
+            }
+
+            return PartialView("Partials/_ProductModalPartial", product);
         }
 
         private static void MapProductVariantToProductVm(Product product, ProductDetail model)

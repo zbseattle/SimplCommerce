@@ -23,27 +23,21 @@
                     var index = vm.shoppingCartItems.indexOf(item);
                     vm.shoppingCartItems.splice(index, 1);
 
-                    var resetedTotalPrice = 0;
-                    $.each(vm.shoppingCartItems, function () {
-                        resetedTotalPrice += this.totalPrice;
-                    });
-                    vm.totalPrice = resetedTotalPrice;
-
+                    vm.totalPrice = shoppingCartService.resetTotalPrice(vm.shoppingCartItems);
                     shoppingCartService.removeShoppingCartItem(item.id);
                 }
 
-                $scope.$watch(angular.bind(this, function () {
-                    return this.shoppingCartItems.map(function (item) {
-                        return item.quantity;
-                    });
-                }), function (newVal, oldVal) {
-                    var resetedTotalPrice = 0;
-                    $.each(vm.shoppingCartItems, function () {
-                        this.totalPrice = this.quantity * this.price;
-                        resetedTotalPrice += this.totalPrice;
-                    });
-                    vm.totalPrice = resetedTotalPrice;
-                });
+                vm.increaseQuantity = function increaseQuantity(item) {
+                    item.quantity += 1;
+                    vm.totalPrice = shoppingCartService.resetTotalPrice(vm.shoppingCartItems);
+                    shoppingCartService.updateQuantity(item.id, item.quantity);
+                }
+
+                vm.decreaseQuantity = function decreaseQuantity(item) {
+                    item.quantity -= 1;
+                    vm.totalPrice = shoppingCartService.resetTotalPrice(vm.shoppingCartItems);
+                    shoppingCartService.updateQuantity(item.id, item.quantity);
+                }
             }
         ]);
 })();

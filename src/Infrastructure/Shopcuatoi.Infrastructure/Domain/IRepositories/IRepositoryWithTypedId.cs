@@ -14,6 +14,8 @@ namespace Shopcuatoi.Infrastructure.Domain.IRepositories
 
         void Add(T entity);
 
+        void Update(T entity);
+
         void SaveChange();
 
         void Remove(T entity);

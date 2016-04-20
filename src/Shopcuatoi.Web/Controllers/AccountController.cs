@@ -478,21 +478,21 @@ namespace Shopcuatoi.Web.Controllers
 
         private Guid GetGuestKey()
         {
-            if (!Request.Cookies.ContainsKey(nameof(ShoppingCartItem.GuestKey)))
+            if (!Request.Cookies.ContainsKey(nameof(ShoppingCart.GuestKey)))
             {
                 return Guid.NewGuid();
             }
-            return Guid.Parse(Request.Cookies[nameof(ShoppingCartItem.GuestKey)].ToString());
+            return Guid.Parse(Request.Cookies[nameof(ShoppingCart.GuestKey)].ToString());
         }
 
         private async void ChangeGuestKeyToUserByUserEmail(string email)
         {
-            if (Request.Cookies.ContainsKey(nameof(ShoppingCartItem.GuestKey)))
+            if (Request.Cookies.ContainsKey(nameof(ShoppingCart.GuestKey)))
             {
                 var guestKey = GetGuestKey();
                 var currentUser = await GetUserByEmailAsync(email);
                 shoppingCartService.ChangeGuestKeyToUser(guestKey, currentUser.Id);
-                Response.Cookies.Delete(nameof(ShoppingCartItem.GuestKey));
+                Response.Cookies.Delete(nameof(ShoppingCart.GuestKey));
             }
         }
 

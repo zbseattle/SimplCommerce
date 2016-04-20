@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
@@ -10,20 +11,26 @@ using HvCommerce.Web.ViewModels.Manage;
 using Microsoft.AspNet.Http;
 using Shopcuatoi.Core.Domain.Models;
 using Shopcuatoi.Infrastructure.Domain.IRepositories;
+using Shopcuatoi.Orders.ApplicationServices;
 using Shopcuatoi.Orders.Domain.Models;
+using Shopcuatoi.Web.ViewModels;
 
 namespace Shopcuatoi.Web.Controllers
 {
-    public class ShoppingCartController : Controller
+    public class ShoppingCartController : BaseController
     {
-        private readonly UserManager<User> userManager;
-        private readonly IRepository<ShoppingCartItem> shoppingCartRepository;
+        private readonly IRepository<ShoppingCart> shoppingCartRepository;
+        private readonly IRepository<ShoppingCartItem> shoppingCartItemRepository;
+        private readonly IShoppingCartService shoppingCartService;
 
         public ShoppingCartController(UserManager<User> userManager,
-            IRepository<ShoppingCartItem> shoppingCartRepository)
+            IRepository<ShoppingCart> shoppingCartRepository,
+            IShoppingCartService shoppingCartService,
+            IRepository<ShoppingCartItem> shoppingCartItemRepository) : base(userManager)
         {
-            this.userManager = userManager;
             this.shoppingCartRepository = shoppingCartRepository;
+            this.shoppingCartItemRepository = shoppingCartItemRepository;
+            this.shoppingCartService = shoppingCartService;
         }
 
         //
@@ -42,13 +49,17 @@ namespace Shopcuatoi.Web.Controllers
             if (currentUser != null)
             {
                 shoppingCarts = await shoppingCartRepository.Query()
-                    .Where(x => x.CreatedById == currentUser.Id).ToListAsync();
+                    .Where(x => x.CreatedById == currentUser.Id)
+                    .Include(x => x.ShoppingCartItems)
+                    .SelectMany(x => x.ShoppingCartItems).Distinct().ToListAsync();
             }
             else
             {
                 var guestKey = GetGuestKey();
                 shoppingCarts = await shoppingCartRepository.Query()
-                    .Where(x => x.GuestKey.HasValue && x.GuestKey.Value == guestKey).ToListAsync();
+                    .Where(x => x.GuestKey.HasValue && x.GuestKey.Value == guestKey)
+                    .Include(x => x.ShoppingCartItems)
+                    .SelectMany(x => x.ShoppingCartItems).Distinct().ToListAsync();
             }
 
             var shoppingCartListItems = shoppingCarts.Select(x =>
@@ -57,7 +68,7 @@ namespace Shopcuatoi.Web.Controllers
                 Id = x.Id,
                 Price = x.Product.Price,
                 Quantity = x.Quantity,
-                CreatedOn = x.CreatedOn.ToString(),
+                CreatedOn = x.CreatedOn.ToString(CultureInfo.InvariantCulture),
                 ProductName = x.Product.Name
             });
 
@@ -67,65 +78,50 @@ namespace Shopcuatoi.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> AddToCart(long productId)
         {
-            var guestKey = GetGuestKey();
-
-            var shoppingCart = new ShoppingCartItem()
-            {
-                ProductId = productId,
-                Quantity = 1,
-                CreatedOn = DateTime.UtcNow
-            };
-
             var user = await GetCurrentUserAsync();
+
             if (user != null)
             {
-                shoppingCart.CreatedById = user.Id;
+                shoppingCartService.AddToCartByUser(productId, user.Id);
             }
             else
             {
-                shoppingCart.GuestKey = guestKey;
-                Response.Cookies.Append(nameof(ShoppingCartItem.GuestKey), guestKey.ToString(), new CookieOptions()
+                var guestKey = GetGuestKey();
+                shoppingCartService.AddToCartByGuestKey(productId, guestKey);
+                Response.Cookies.Append(nameof(ShoppingCart.GuestKey), guestKey.ToString(), new CookieOptions()
                 {
                     Expires = DateTime.MaxValue
                 });
             }
-
-            shoppingCartRepository.Add(shoppingCart);
-            shoppingCartRepository.SaveChange();
-
             return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
-        public IActionResult Remove([FromBody] long id)
+        public IActionResult Remove([FromBody] long itemId)
         {
-            var shoppingCart = shoppingCartRepository.Get(id);
-            if (shoppingCart == null)
+            var shoppingCartItem = shoppingCartItemRepository.Get(itemId);
+            if (shoppingCartItem == null)
             {
                 return new HttpStatusCodeResult(400);
             }
 
-            shoppingCartRepository.Remove(shoppingCart);
-            shoppingCartRepository.SaveChange();
+            shoppingCartItemRepository.Remove(shoppingCartItem);
+            shoppingCartItemRepository.SaveChange();
             return Json(true);
         }
 
-        #region Helpers
-
-        private async Task<User> GetCurrentUserAsync()
+        [HttpPost]
+        public IActionResult UpdateQuantity([FromBody] ShoppingCartItemViewModel shoppingCartItem)
         {
-            return await userManager.FindByIdAsync(HttpContext.User.GetUserId());
-        }
-
-        private Guid GetGuestKey()
-        {
-            if (!Request.Cookies.ContainsKey(nameof(ShoppingCartItem.GuestKey)))
+            var entityShoppingCartItem = shoppingCartItemRepository.Get(shoppingCartItem.ItemId);
+            if (entityShoppingCartItem == null)
             {
-                return Guid.NewGuid();
+                return new HttpStatusCodeResult(400);
             }
-            return Guid.Parse(Request.Cookies[nameof(ShoppingCartItem.GuestKey)].ToString());
+            entityShoppingCartItem.Quantity = shoppingCartItem.Quantity;
+            shoppingCartItemRepository.Update(entityShoppingCartItem);
+            shoppingCartItemRepository.SaveChange();
+            return Json(true);
         }
-
-        #endregion
     }
 }

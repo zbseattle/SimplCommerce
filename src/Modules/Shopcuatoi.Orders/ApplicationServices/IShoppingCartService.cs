@@ -9,5 +9,9 @@ namespace Shopcuatoi.Orders.ApplicationServices
     public interface IShoppingCartService
     {
         void ChangeGuestKeyToUser(Guid guestKey, long userId);
+
+        void AddToCartByUser(long productId, long userId);
+
+        void AddToCartByGuestKey(long productId, Guid guestKey);
     }
 }

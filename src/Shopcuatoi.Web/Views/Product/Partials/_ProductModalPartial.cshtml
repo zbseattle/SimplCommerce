@@ -1,0 +1,15 @@
+﻿@using Shopcuatoi.Core.Domain.Models
+@model Product
+
+
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <h4 class="modal-title" id="myModalLabel">Modal title</h4>
+</div>
+<div class="modal-body">
+    Your product was added to shopping cart, do you want to continue shopping or go to cart?
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default" data-dismiss="modal">Continue shopping</button>
+    @Html.ActionLink("Go to shopping cart", "Index", "ShoppingCart", null, new { @class = "btn btn-primary" })
+</div>
