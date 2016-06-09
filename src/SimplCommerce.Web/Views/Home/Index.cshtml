@@ -72,18 +72,16 @@
 @await Html.PartialAsync("ProductList", new ProductList(Model.FeaturedProducts, 4))
 
 <div>
+	<h2 class="page-header">Information</h2>
+	<p>This is the demo for <a target="_blank" href="https://github.com/simplcommerce/SimplCommerce">SimplCommerce</a>, a super simple ecommerce system built on .NET Core</p>
+	<p>This website is hosted on an Ubuntu 14.04 Azure virtual machine A0 (shared core, 768 MB memory) with Postgresql installed in the same box.</p>
+</div>
+
+<div>
     <h2 class="page-header">Administrator</h2>
     <p>Manage your store. Admin email: admin@SimplCommerce.com. Admin password: 1qazZAQ!</p>
     <p>
         <a class="btn btn-primary" href="Admin" role="button">Go to Dashboard</a>
     </p>
-</div>
-
-<div>
-    <h2 class="page-header">Sample data</h2>
-    <h1>Delete all current catalog data and create sample catalog</h1>
-    <form asp-controller="SampleData" asp-action="ResetToSample" method="post">
-        <button type="submit" class="btn btn-danger">Do it!</button>
-    </form>
 </div>
 
