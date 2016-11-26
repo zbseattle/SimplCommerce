@@ -101,6 +101,6 @@ RUN cd src && dotnet restore && dotnet build **/**/project.json
 
 RUN cd src/SimplCommerce.WebHost && npm install && npm install --global gulp-cli && gulp copy-modules
 
-RUN cd src/SimplCommerce.WebHost && rm /path/to/directory/* && donet ef migrations add initialSchema
+RUN cd src/SimplCommerce.WebHost && rm Migrations/* && donet ef migrations add initialSchema
 
 CMD ["postgres"]
