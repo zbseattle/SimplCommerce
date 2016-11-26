@@ -112,7 +112,7 @@ namespace SimplCommerce.WebHost.Extensions
         public static IServiceCollection AddCustomizedDataStore(this IServiceCollection services, IConfigurationRoot configuration)
         {
             services.AddDbContext<SimplDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"),
+                options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"),
                     b => b.MigrationsAssembly("SimplCommerce.WebHost")));
             return services;
         }
