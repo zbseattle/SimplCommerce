@@ -101,6 +101,18 @@ RUN cd src && dotnet restore && dotnet build **/**/project.json
 
 RUN cd src/SimplCommerce.WebHost && npm install && npm install --global gulp-cli && gulp copy-modules
 
-RUN cd src/SimplCommerce.WebHost && rm Migrations/* && dotnet ef migrations add initialSchema
+# RUN cd src/SimplCommerce.WebHost && rm Migrations/* && dotnet ef migrations add initialSchema
 
-CMD ["postgres"]
+USER postgres
+RUN /etc/init.d/postgresql start \
+    && psql --command "CREATE USER simplcommcere WITH SUPERUSER PASSWORD 'simplcommcere';" \
+    && createdb -O simplcommcere simplcommceredb
+	
+USER root
+RUN cd src/SimplCommerce.WebHost && dotnet ef database update
+
+USER postgres
+psql -f src/Database/StaticData_Postgres.sql simplcommceredb
+
+# Set the default command to run when starting the container
+CMD ["/usr/lib/postgresql/9.5/bin/postgres", "-D", "/var/lib/postgresql/9.5/main", "-c", "config_file=/etc/postgresql/9.5/main/postgresql.conf"]
