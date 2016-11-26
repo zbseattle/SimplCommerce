@@ -104,7 +104,7 @@ RUN cd src/SimplCommerce.WebHost && npm install && npm install --global gulp-cli
 # RUN cd src/SimplCommerce.WebHost && rm Migrations/* && dotnet ef migrations add initialSchema
 
 USER postgres
-RUN /etc/init.d/postgresql start \
+RUN postgres \
     && psql --command "CREATE USER simplcommcere WITH SUPERUSER PASSWORD 'simplcommcere';" \
     && createdb -O simplcommcere simplcommceredb
 	
