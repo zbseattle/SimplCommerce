@@ -16,46 +16,46 @@ RUN apt-get update \
         libunwind8 \
         libuuid1 \
         zlib1g \
-		bzr \
-		git \
+        bzr \
+        git \
         procps \
-		autoconf \
-		automake \
-		bzip2 \
-		file \
-		g++ \
-		gcc \
-		imagemagick \
-		libbz2-dev \
-		libc6-dev \
-		libcurl4-openssl-dev \
-		libdb-dev \
-		libevent-dev \
-		libffi-dev \
-		libgdbm-dev \
-		libgeoip-dev \
-		libglib2.0-dev \
-		libjpeg-dev \
-		libkrb5-dev \
-		liblzma-dev \
-		libmagickcore-dev \
-		libmagickwand-dev \
-		libmysqlclient-dev \
-		libncurses-dev \
-		libpng-dev \
-		libpq-dev \
-		libreadline-dev \
-		libsqlite3-dev \
-		libssl-dev \
-		libtool \
-		libwebp-dev \
-		libxml2-dev \
-		libxslt-dev \
-		libyaml-dev \
-		make \
-		patch \
-		xz-utils \
-		zlib1g-dev \
+        autoconf \
+        automake \
+        bzip2 \
+        file \
+        g++ \
+        gcc \
+        imagemagick \
+        libbz2-dev \
+        libc6-dev \
+        libcurl4-openssl-dev \
+        libdb-dev \
+        libevent-dev \
+        libffi-dev \
+        libgdbm-dev \
+        libgeoip-dev \
+        libglib2.0-dev \
+        libjpeg-dev \
+        libkrb5-dev \
+        liblzma-dev \
+        libmagickcore-dev \
+        libmagickwand-dev \
+        libmysqlclient-dev \
+        libncurses-dev \
+        libpng-dev \
+        libpq-dev \
+        libreadline-dev \
+        libsqlite3-dev \
+        libssl-dev \
+        libtool \
+        libwebp-dev \
+        libxml2-dev \
+        libxslt-dev \
+        libyaml-dev \
+        make \
+        patch \
+        xz-utils \
+        zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
 RUN curl -sSL -o dotnet.tar.gz https://go.microsoft.com/fwlink/?LinkID=835021 --output dotnet.tar.gz \
@@ -99,6 +99,8 @@ COPY $source .
 
 RUN cd src && dotnet restore && dotnet build **/**/project.json
 
-RUN cd src/SimplCommerce.WebHost && npm install && gulp copy-modules
+RUN cd src/SimplCommerce.WebHost && npm install && npm install --global gulp-cli && gulp copy-modules
+
+RUM cd src/SimplCommerce && rm /path/to/directory/*
 
 CMD ["postgres"]

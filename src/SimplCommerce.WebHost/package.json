@@ -3,7 +3,6 @@
 	"name": "simplcommerce",
 	"private": true,
   "devDependencies": {
-    "gulp-cli": "1.2.2",
     "gulp": "3.9.1",
     "gulp-clean": "0.3.2"
   }
