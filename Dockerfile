@@ -16,7 +16,46 @@ RUN apt-get update \
         libunwind8 \
         libuuid1 \
         zlib1g \
+		bzr \
+		git \
         procps \
+		autoconf \
+		automake \
+		bzip2 \
+		file \
+		g++ \
+		gcc \
+		imagemagick \
+		libbz2-dev \
+		libc6-dev \
+		libcurl4-openssl-dev \
+		libdb-dev \
+		libevent-dev \
+		libffi-dev \
+		libgdbm-dev \
+		libgeoip-dev \
+		libglib2.0-dev \
+		libjpeg-dev \
+		libkrb5-dev \
+		liblzma-dev \
+		libmagickcore-dev \
+		libmagickwand-dev \
+		libmysqlclient-dev \
+		libncurses-dev \
+		libpng-dev \
+		libpq-dev \
+		libreadline-dev \
+		libsqlite3-dev \
+		libssl-dev \
+		libtool \
+		libwebp-dev \
+		libxml2-dev \
+		libxslt-dev \
+		libyaml-dev \
+		make \
+		patch \
+		xz-utils \
+		zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
 RUN curl -sSL -o dotnet.tar.gz https://go.microsoft.com/fwlink/?LinkID=835021 --output dotnet.tar.gz \
@@ -44,7 +83,7 @@ RUN set -ex \
   done
 
 ENV NPM_CONFIG_LOGLEVEL info
-ENV NODE_VERSION 7.2.0
+ENV NODE_VERSION 6.9.1
 
 RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz" \
   && curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
@@ -58,6 +97,8 @@ ARG source=.
 WORKDIR /app
 COPY $source .
 
-RUN cd src && dotnet restore
+RUN cd src && dotnet restore && dotnet build **/**/project.json
+
+RUN cd src/SimplCommerce.WebHost && npm install && gulp copy-modules
 
 CMD ["postgres"]
