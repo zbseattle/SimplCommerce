@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
-cd src/SimplCommerce.WebHost && dotnet ef database update
+cd /app/src/SimplCommerce.WebHost && dotnet ef database update
 
-cd src/SimplCommerce.WebHost && dotnet run
+psql --username postgres -d simplcommerce -a -f /app/src/Database/StaticData_Postgres.sql
+
+cd /app/src/SimplCommerce.WebHost && dotnet run
