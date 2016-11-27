@@ -84,6 +84,7 @@ RUN set -ex \
 
 ENV NPM_CONFIG_LOGLEVEL info
 ENV NODE_VERSION 6.9.1
+ENV POSTGRES_PASSWORD postgres
 
 RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz" \
   && curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
@@ -93,6 +94,8 @@ RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-
   && rm "node-v$NODE_VERSION-linux-x64.tar.xz" SHASUMS256.txt.asc SHASUMS256.txt \
   && ln -s /usr/local/bin/node /usr/local/bin/nodejs
 
+ADD dockerinitcontainer.sh /docker-entrypoint-initdb.d/
+  
 ARG source=.
 WORKDIR /app
 COPY $source .
