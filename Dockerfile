@@ -11,5 +11,6 @@ RUN cd src/SimplCommerce.WebHost && npm install && gulp copy-modules
 # RUN cd src/SimplCommerce.WebHost && rm Migrations/* && dotnet ef migrations add initialSchema
 
 COPY docker-entrypoint.sh /
+RUN chmod 755 /docker-entrypoint.sh
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
