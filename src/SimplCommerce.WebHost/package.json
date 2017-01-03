@@ -1,7 +1,7 @@
 {
 	"version": "1.0.0",
 	"name": "SimplCommerce",
-	"private": true,
+  "private": true,
   "devDependencies": {
     "gulp": "3.9.1",
     "gulp-clean": "0.3.2"
