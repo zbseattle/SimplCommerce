@@ -38,6 +38,16 @@ gulp.task('copy-modules', ['clean-module'], function () {
             .pipe(gulp.dest(paths.hostModules + 'SimplCommerce.Module.SampleData/SampleContent'));
 });
 
+for (var i = 0; i < modules.length; i++) {
+    var shortName = modules[i].split('.')[2];
+    gulp.task('copy-' + shortName + '-module', function () {
+        gulp.src([paths.devModules + modules[i] + '/Views/**/*.*', paths.devModules + modules[i] + '/wwwroot/**/*.*'], { base: modules[i] })
+            .pipe(gulp.dest(paths.hostModules + modules[i]));
+        gulp.src(paths.devModules + modules[i] + '/bin/Debug/netstandard1.6/**/*.*')
+            .pipe(gulp.dest(paths.hostModules + modules[i] + '/bin'));
+    });
+}
+
 gulp.task('copy-ms', function () {
     modules.forEach(function (module) {
         gulp.src([paths.devModules + module + '/Views/**/*.*', paths.devModules + module + '/wwwroot/**/*.*'], { base: module })
