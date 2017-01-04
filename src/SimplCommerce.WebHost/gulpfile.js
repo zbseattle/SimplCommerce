@@ -39,7 +39,7 @@ gulp.task('copy-modules', ['clean-module'], function () {
 });
 
 for (var i = 0; i < modules.length; i++) {
-    var shortName = modules[i].split('.')[2];
+    var shortName = modules[i].split('.')[2].toLowerCase();
     gulp.task('copy-' + shortName + '-module', function () {
         gulp.src([paths.devModules + modules[i] + '/Views/**/*.*', paths.devModules + modules[i] + '/wwwroot/**/*.*'], { base: modules[i] })
             .pipe(gulp.dest(paths.hostModules + modules[i]));
