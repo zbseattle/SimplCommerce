@@ -1,4 +1,5 @@
-<div class="row">
+
+<div ng-controller="MenuManagementCtrl" class="row">
     <ul class="nav nav-tabs">
         <li class="active">
             <a href="#edit-menu" data-toggle="tab">Edit Menu</a>
@@ -9,39 +10,61 @@
     </ul>
     <div class="tab-content">
         <div class="tab-pane active in" id="edit-menu">
-            <form class="form-horizontal" action='' method="POST">
-                <fieldset>
-                    <div id="legend">
-                        <legend class="">Login</legend>
+            <div class="col-md-3">
+                <uib-accordion>
+                    <div uib-accordion-group class="panel-default" is-open="status.isCategoriesOpen">
+                        <uib-accordion-heading>
+                            Categories <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.isCategoriesOpen, 'glyphicon-chevron-right': !status.isCategoriesOpen}"></i>
+                        </uib-accordion-heading>
+                        This is just some content to illustrate fancy headings.
                     </div>
-                    <div class="control-group">
-                        <!-- Username -->
-                        <label class="control-label" for="username">Username</label>
-                        <div class="controls">
-                            <input type="text" id="username" name="username" placeholder="" class="input-xlarge">
+                </uib-accordion>
+                <uib-accordion>
+                    <div uib-accordion-group class="panel-default" is-open="status.isPagesOpen">
+                        <uib-accordion-heading>
+                            Pages <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.isPagesOpen, 'glyphicon-chevron-right': !status.isPagesOpen}"></i>
+                        </uib-accordion-heading>
+                        This is just some content to illustrate fancy headings.
+                    </div>
+                </uib-accordion>
+                <uib-accordion>
+                    <div uib-accordion-group class="panel-default" is-open="status.isPostsOpen">
+                        <uib-accordion-heading>
+                            Posts <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.isPostsOpen, 'glyphicon-chevron-right': !status.isPostsOpen}"></i>
+                        </uib-accordion-heading>
+                        This is just some content to illustrate fancy headings.
+                    </div>
+                </uib-accordion>
+                <uib-accordion>
+                    <div uib-accordion-group class="panel-default" is-open="status.isCustomLinksOpen">
+                        <uib-accordion-heading>
+                            Custom Links <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.isCustomLinksOpen, 'glyphicon-chevron-right': !status.isCustomLinksOpen}"></i>
+                        </uib-accordion-heading>
+                        This is just some content to illustrate fancy headings.
+                    </div>
+                </uib-accordion>             
+            </div>
+            <div class="col-md-9">
+                <form id="update-nav-menu">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <div class="form-inline">
+                                <div class="form-group">
+                                    <label for="menuName">Menu Name</label>
+                                    <input class="form-control" id="menuName" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <label>Menu Structure</label>
+                            <p>
+                                Drag each item into the order you prefer. Click the arrow on the right of the item to reveal additional configuration options.
+                            </p>
                         </div>
                     </div>
-
-                    <div class="control-group">
-                        <!-- Password-->
-                        <label class="control-label" for="password">Password</label>
-                        <div class="controls">
-                            <input type="password" id="password" name="password" placeholder="" class="input-xlarge">
-                        </div>
-                    </div>
-
-
-                    <div class="control-group">
-                        <!-- Button -->
-                        <div class="controls">
-                            <button class="btn btn-success">Login</button>
-                        </div>
-                    </div>
-                </fieldset>
-            </form>
-        </div>
+                </form>
+            </div>
         <div class="tab-pane fade" id="manage-locations">
-
         </div>
     </div>
 </div>

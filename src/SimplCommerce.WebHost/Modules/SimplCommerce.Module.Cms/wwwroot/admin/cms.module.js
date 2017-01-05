@@ -39,6 +39,11 @@
                     url: '/widget-html/edit/:id',
                     templateUrl: 'cms/admin/html-widget/html-widget-form.html',
                     controller: 'HtmlWidgetFormCtrl as vm'
+                })
+                .state('menu-management', {
+                    url: '/menu-management',
+                    templateUrl: 'cms/admin/menu-management/menu-management-form.html',
+                    controller: 'MenuManagementCtrl as vm'
                 });
         }]);
 })();
