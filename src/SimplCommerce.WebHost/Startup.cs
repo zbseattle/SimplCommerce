@@ -44,7 +44,7 @@ namespace SimplCommerce.WebHost
             var connectionStringConfig = builder.Build();
 
             builder.AddEntityFrameworkConfig(options =>
-                    options.UseSqlServer(connectionStringConfig.GetConnectionString("DefaultConnection"))
+                    options.UseNpgsql(connectionStringConfig.GetConnectionString("DefaultConnection"))
            );
 
             Configuration = builder.Build();
