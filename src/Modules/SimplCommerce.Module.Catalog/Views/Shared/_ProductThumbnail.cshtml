@@ -5,6 +5,7 @@
         <img alt="@Model.Name" src="@Model.ThumbnailUrl">
         <div class="caption">
             <h4 class="product-name">@Model.Name</h4>
+            <h5 class="product-date">@Model.UpdatedOn.DateTime.ToLocalTime().ToString("ddd, MMM dd yyyy h:mm tt")</h5>
             <p class="product-price">
                 @if (Model.IsCallForPricing)
                 {
@@ -12,7 +13,15 @@
                 }
                 else
                 {
-                    @Model.CalculatedProductPrice.Price.ToString("C")
+                    @if (@Model.CalculatedProductPrice.Price == 0)
+                    {
+                        <!-- TODO: Localizer -->
+                        @Localizer["Free"]
+                    }
+                    else
+                    {
+                        @Model.CalculatedProductPrice.Price.ToString("C")
+                    }
                     if (Model.CalculatedProductPrice.PercentOfSaving > 0)
                     {
                         <span class="product-price-saving">-@(Model.CalculatedProductPrice.PercentOfSaving)%</span>

@@ -1,6 +1,7 @@
 ﻿@model SimplCommerce.Module.Cms.ViewModels.CarouselWidgetViewComponentVm
 
-<div id="carousel@(Model.Id)" class="carousel slide" data-ride="carousel" data-interval="@Model.DataInterval">
+@*<div id="carousel@(Model.Id)" class="carousel slide" data-ride="carousel" data-interval="@Model.DataInterval">*@
+<div id="carousel@(Model.Id)" class="carousel slide" data-interval="@Model.DataInterval" style="width: 50%;margin:auto;">
     <ol class="carousel-indicators">
         @for (int i = 0; i < Model.Items.Count; i++)
         {
@@ -14,7 +15,7 @@
             }
         }
     </ol>
-    <div class="carousel-inner" role="listbox">
+    <div class="carousel-inner" role="listbox" style="width:100%; margin:auto;">
     @foreach (var item in Model.Items)
     {
         <div class="item @(item == Model.Items.First() ? "active" : null)">

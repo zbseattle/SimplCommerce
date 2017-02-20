@@ -36,6 +36,11 @@ namespace SimplCommerce.Module.Catalog.Controllers
 
         public IActionResult BrandDetail(long id, SearchOption searchOption)
         {
+            if (!ModelState.IsValid)
+            {
+                return Redirect("~/");
+            }
+
             var brand = _brandRepository.Query().FirstOrDefault(x => x.Id == id);
 
             var model = new ProductsByBrand
@@ -89,6 +94,7 @@ namespace SimplCommerce.Module.Catalog.Controllers
                 {
                     Id = x.Id,
                     Name = x.Name,
+                    UpdatedOn = x.UpdatedOn,
                     SeoTitle = x.SeoTitle,
                     Price = x.Price,
                     OldPrice = x.OldPrice,
@@ -125,6 +131,12 @@ namespace SimplCommerce.Module.Catalog.Controllers
             var sortBy = searchOption.Sort ?? string.Empty;
             switch (sortBy.ToLower())
             {
+                case "date-desc":
+                    query = query.OrderByDescending(x => x.UpdatedOn);
+                    break;
+                case "date-asc":
+                    query = query.OrderBy(x => x.UpdatedOn);
+                    break;
                 case "price-desc":
                     query = query.OrderByDescending(x => x.Price);
                     break;

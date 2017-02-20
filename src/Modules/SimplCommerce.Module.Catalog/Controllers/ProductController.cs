@@ -46,6 +46,7 @@ namespace SimplCommerce.Module.Catalog.Controllers
             {
                 Id = product.Id,
                 Name = product.Name,
+                UpdatedOn = product.UpdatedOn,
                 CalculatedProductPrice = _productPricingService.CalculateProductPrice(product),
                 IsCallForPricing = product.IsCallForPricing,
                 IsAllowToOrder = product.IsAllowToOrder,

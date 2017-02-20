@@ -17,6 +17,7 @@ using SimplCommerce.Module.Core.Models;
 using SimplCommerce.Module.Localization;
 using SimplCommerce.WebHost.Extensions;
 using Microsoft.EntityFrameworkCore;
+using SimplCommerce.Module.Core.Services;
 
 namespace SimplCommerce.WebHost
 {
@@ -75,6 +76,8 @@ namespace SimplCommerce.WebHost
                 options => { options.ViewLocationExpanders.Add(new ModuleViewLocationExpander()); });
 
             services.AddCustomizedMvc(GlobalConfiguration.Modules);
+
+            services.Configure<AuthMessageSenderOptions>(Configuration);
 
             return services.Build(Configuration, _hostingEnvironment);
         }

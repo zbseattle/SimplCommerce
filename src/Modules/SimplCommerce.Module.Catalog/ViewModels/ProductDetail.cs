@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using SimplCommerce.Module.Catalog.Models;
 using SimplCommerce.Module.Core.ViewModels;
@@ -10,6 +11,8 @@ namespace SimplCommerce.Module.Catalog.ViewModels
         public long Id { get; set; }
 
         public string Name { get; set; }
+
+        public DateTimeOffset UpdatedOn { get; set; }
 
         public string ShortDescription { get; set; }
 

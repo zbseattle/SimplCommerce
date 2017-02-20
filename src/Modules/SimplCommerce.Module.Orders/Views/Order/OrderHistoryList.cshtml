@@ -21,7 +21,7 @@
             @foreach (var order in Model)
             {
                 <tr>
-                    <td>@order.CreatedOn</td>
+                    <td>@order.CreatedOn.DateTime.ToLocalTime().ToString("ddd, MMM dd yyyy h:mm tt")</td>
                     <td>
                         @foreach (var item in order.OrderItems)
                         {

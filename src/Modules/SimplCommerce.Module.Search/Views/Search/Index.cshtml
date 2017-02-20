@@ -13,7 +13,7 @@
 <div class="row">
     <div class="col-md-3 product-list-filters">
         <h3>Filter by</h3>
-        <form id="productFilter" name="productFilter" method="GET" action="~/search">
+        <form class="form-horizontal" id="productFilter" name="productFilter" method="GET" action="~/search">
             <div class="panel-group" id="accordion-category">
                 <div class="panel panel-default">
                     <div class="panel-heading">
@@ -99,6 +99,60 @@
                 </div>
             </div>
             }
+
+            <div class="panel-group" id="accordion-dates">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h2 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion-dates" href="#collapse-dates">
+                                @* TODO @Localizer["Price"] *@
+                                Dates
+                                <i class="fa fa-angle-down"></i>
+                            </a>
+                        </h2>
+                    </div>
+                    <div id="collapse-dates" class="panel-collapse collapse in">
+                        <div class="panel-body">
+                            <div class="form-group">
+                                <label asp-for="CurrentSearchOption.StartDate" class="col-sm-3 control-label">Start</label>
+                                <div class="col-sm-9">
+                                    <input id="StartDate" asp-for="CurrentSearchOption.StartDate" class="form-control" />
+                                    <span asp-validation-for="CurrentSearchOption.StartDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label asp-for="CurrentSearchOption.EndDate" class="col-sm-3 control-label">End</label>
+                                <div class="col-sm-9">
+                                    <input id="EndDate" asp-for="CurrentSearchOption.EndDate" class="form-control" />
+                                    <span asp-validation-for="CurrentSearchOption.EndDate" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <!--
+                            Hack!
+
+                            A standard submit-type button isn't causing our SearchOptions to be updated by Core 
+                            (presumably as part of MVC validation), via the button's onClick method in product-filter.js.
+
+                            <button type="submit" class="btn btn-default">Save</button>
+
+                            So I'll work around this with a checkbox, styled to disguise it as a regular button, since
+                            validation for checkboxes _does_ work correctly.
+                            -->
+                            <div class="form-group">
+                                <div class="col-sm-offset-3 col-sm-6">
+                                    <input type="checkbox" value="Update" id="submit" style="display:none" />
+                                    <label for="submit" >
+                                        <span id="submitSpan" class="btn btn-default"
+                                            style="display:inline-block;width:100px;height:34px;vertical-align:middle;font-weight:bold">Update</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </form>
     </div>
     <div class="col-md-9">
@@ -159,6 +213,9 @@
 @section scripts {
     <script src="~/lib/wnumb/wNumb.js"></script>
     <script src="~/lib/nouislider/nouislider.min.js"></script>
+    <script src="~/lib/jquery-validation/jquery.validate.js"></script>
+    <script src="~/lib/jquery-validation/additional-methods.js"></script>    
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>    
 
     <script>
         var productFilter = {};
@@ -169,6 +226,65 @@
             currentMin: @((Model.CurrentSearchOption.MinPrice ?? Model.FilterOption.Price.MinPrice).ToString("F0")),
             currentMax: @((Model.CurrentSearchOption.MaxPrice ?? Model.FilterOption.Price.MaxPrice).ToString("F0"))
         };
+
+        $(function () {
+            window.customValidation = window.customValidation ||
+                {
+                    relatedControlValidationCalled: function (event) {
+                        if (!customValidation.activeValidator) {
+                            customValidation.formValidator = $(event.data.source).closest('form').data('validator');
+                        }
+                        customValidation.formValidator.element($(event.data.target));
+                    },
+                    relatedControlCollection: [],
+                    formValidator: undefined,
+                    addDependentControlValidationHandler: function (element, dependentPropertyName) {
+                        var id = $(element).attr('id');
+                        if ($.inArray(id, customValidation.relatedControlCollection) < 0) {
+                            customValidation.relatedControlCollection.push(id);
+                            $(element).on(
+                                'blur',
+                                { source: $(element), target: $('#' + dependentPropertyName) },
+                                customValidation.relatedControlValidationCalled);
+                        }
+                    }
+                };
+
+            $.validator.unobtrusive.adapters.add('comparedates', ['otherdate'],
+                    function (options) {
+                        options.rules['comparedates'] = options.params;
+                        if (options.message) {
+                            options.messages['comparedates'] = options.message;
+                        }
+                    }
+                );
+
+            $.validator.addMethod('comparedates', function (value, element, params) {
+                var otherFieldValue = $('input[id="' + params.otherdate + '"]').val();
+                if (otherFieldValue && value) {
+                    var currentValue = Date.parse(value);
+                    var otherValue = Date.parse(otherFieldValue);
+                    if ($(element).attr('name').toLowerCase().indexOf('start') >= 0) {
+                        if (currentValue > otherValue) {
+                            document.getElementById('submit').enabled = "false";
+                            document.getElementById('submitSpan').className = "btn btn-default disabled";
+                            return false;
+                        }
+                    } else {
+                        if (currentValue < otherValue) {
+                            document.getElementById('submit').enabled = "false";
+                            document.getElementById('submitSpan').className = "btn btn-default disabled";
+                            return false;
+                        }
+                    }
+                }
+                customValidation.addDependentControlValidationHandler(element, params.otherdate);
+                document.getElementById('submit').enabled = "true";
+                document.getElementById('submitSpan').className = "btn btn-default";
+                return true;
+                });
+        }(jQuery));
+                
     </script>
     <script src="~/catalog/product-filter.js"></script>
 }

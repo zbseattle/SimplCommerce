@@ -102,7 +102,10 @@ namespace SimplCommerce.WebHost.Extensions
 
         public static IServiceCollection AddCustomizedIdentity(this IServiceCollection services)
         {
-            services.AddIdentity<User, Role>(configure => { configure.Cookies.ApplicationCookie.LoginPath = "/login"; })
+            services.AddIdentity<User, Role>(configure => {
+                    configure.Cookies.ApplicationCookie.LoginPath = "/login";
+                    configure.SignIn.RequireConfirmedEmail = true;
+                })
                 .AddRoleStore<SimplRoleStore>()
                 .AddUserStore<SimplUserStore>()
                 .AddDefaultTokenProviders();

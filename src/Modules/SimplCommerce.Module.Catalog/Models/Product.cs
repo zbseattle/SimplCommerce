@@ -124,6 +124,7 @@ namespace SimplCommerce.Module.Catalog.Models
             product.IsCallForPricing = IsCallForPricing;
             product.StockQuantity = StockQuantity;
             product.BrandId = BrandId;
+            product.UpdatedOn = UpdatedOn;
 
             foreach (var attribute in AttributeValues)
             {

@@ -47,6 +47,7 @@ namespace SimplCommerce.Module.Catalog.Components
               {
                   Id = x.Id,
                   Name = x.Name,
+                  UpdatedOn = x.UpdatedOn,
                   SeoTitle = x.SeoTitle,
                   Price = x.Price,
                   OldPrice = x.OldPrice,

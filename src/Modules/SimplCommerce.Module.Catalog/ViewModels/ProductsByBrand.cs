@@ -22,7 +22,9 @@ namespace SimplCommerce.Module.Catalog.ViewModels
         public IList<SelectListItem> AvailableSortOptions => new List<SelectListItem>
         {
             new SelectListItem { Text = "Price: Low to High", Value = "price-asc" },
-            new SelectListItem { Text = "Price: High to Low", Value = "price-desc" }
+            new SelectListItem { Text = "Price: High to Low", Value = "price-desc" },
+            new SelectListItem { Text = "Date: Start to End", Value = "date-asc" },
+            new SelectListItem { Text = "Date: End to Start", Value = "date-desc" }
         };
     }
 }

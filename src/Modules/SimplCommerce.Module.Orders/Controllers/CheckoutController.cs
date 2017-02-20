@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Threading.Tasks;
+using System.Globalization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -83,6 +84,8 @@ namespace SimplCommerce.Module.Orders.Controllers
                     Value = x.Id.ToString()
                 }).ToList();
 
+            model.Language = CultureInfo.CurrentCulture.Name;
+
             return View(model);
         }
 
@@ -104,7 +107,8 @@ namespace SimplCommerce.Module.Orders.Controllers
                 {
                     AddressLine1 = model.NewAddressForm.AddressLine1,
                     ContactName = model.NewAddressForm.ContactName,
-                    CountryId = 1,
+                    //CountryId = 1,
+                    CountryId = 2, // US
                     StateOrProvinceId = model.NewAddressForm.StateOrProvinceId,
                     DistrictId = model.NewAddressForm.DistrictId,
                     Phone = model.NewAddressForm.Phone

@@ -36,12 +36,18 @@
         <div class="main-header">
             <div class="container">
                 <div class="row">
-                    <div class="col-xs-12 col-md-4 logo">
+                    <div class="col-xs-6 col-md-3 logo">
                         <a asp-controller="Home" asp-action="Index">
-                            <img alt="SimplCommerce" src="~/images/Logo_SimplCommerce.png" />
+                            <!--<img alt="SimplCommerce" src="~/images/Logo_SimplCommerce.png" />-->
+                            <img alt="VenuGrayhawk" src="~/images/logo_venu.png" style="max-width: 100%; height: auto;"/>
                         </a>
                     </div>
-                    <div class="col-xs-10 col-md-7 search-box">
+                    <div class="col-xs-6 col-md-3 logo">
+                        <a asp-controller="Home" asp-action="Index">
+                            <img alt="EdgeGrayhawk" src="~/images/logo_edge.png" style="max-width: 100%; height: auto;"/>
+                        </a>
+                    </div>
+                    <div class="col-xs-10 col-md-5 search-box">
                         @await Component.InvokeAsync("SearchForm")
                     </div>
                     <div class="col-xs-2 col-md-1 cart-btn">

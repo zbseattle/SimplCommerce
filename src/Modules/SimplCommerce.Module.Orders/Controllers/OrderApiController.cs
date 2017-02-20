@@ -146,6 +146,7 @@ namespace SimplCommerce.Module.Orders.Controllers
                     Id = x.Id,
                     ProductName = x.Product.Name,
                     ProductPrice = x.ProductPrice,
+                    ProductDate = x.Product.UpdatedOn,
                     ProductImage = _mediaService.GetThumbnailUrl(x.Product.ThumbnailImage),
                     Quantity = x.Quantity,
                     VariationOptions = OrderItemVm.GetVariationOption(x.Product)

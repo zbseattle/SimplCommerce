@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using SimplCommerce.Module.Catalog.Models;
@@ -14,8 +15,12 @@ namespace SimplCommerce.Module.Orders.ViewModels
         public string ProductImage { get; set; }
 
         public decimal ProductPrice { get; set; }
-
+        
         public string ProductPriceString => ProductPrice.ToString("C");
+
+        public DateTimeOffset ProductDate { get; set; }
+
+        public string ProductDateString => ProductDate.ToLocalTime().ToString("ddd, MMM dd yyyy h:mm tt");
 
         public int Quantity { get; set; }
 

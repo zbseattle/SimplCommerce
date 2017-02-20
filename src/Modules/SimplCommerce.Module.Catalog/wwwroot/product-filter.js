@@ -112,6 +112,17 @@
             window.location = createUrl();
         });
 
+        /* See Hack description in index.cshtml */
+        $('#collapse-dates input:checkbox').on('click', function () {
+            if(document.getElementById('submit').enabled == "true")
+            {
+                currentSearchOption.startDate = document.getElementById('StartDate').value;
+                currentSearchOption.endDate = document.getElementById('EndDate').value;
+                window.location = createUrl();
+            }
+        });
+        
+
         intPriceSlider();
     });
 })(jQuery, productFilter.currentSearchOption, productFilter.priceSetting);

@@ -37,6 +37,9 @@
             <div class="product-name">
                 <h1 class="">@Model.Name</h1>
             </div>
+            <div class="product-date">
+                <h4 class="">@Model.UpdatedOn.DateTime.ToLocalTime().ToString("ddd, MMM dd yyyy h:mm tt")</h4>
+            </div>
             <ul class="list-inline product-ratings">
                 <li><input value="@Model.RatingAverage" readonly="readonly" class="rating-loading" step="1" data-size="xs" data-show-clear="false" data-show-caption="false" /></li>
                 <li class="product-review-list">
@@ -78,11 +81,18 @@
                             }
                             else
                             {
-                                <h3>@variant.CalculatedProductPrice.Price.ToString("C")</h3>
-                                if (variant.CalculatedProductPrice.PercentOfSaving > 0)
+                                @if (@variant.CalculatedProductPrice.Price == 0)
                                 {
-                                    <p class="product-price-regular">@variant.CalculatedProductPrice.OldPrice.Value.ToString("C")</p>
-                                    <p class="product-price-saving">You save (@(variant.CalculatedProductPrice.PercentOfSaving)%)</p>
+                                    <h3>@Localizer["Free"]</h3>
+                                }
+                                else
+                                {
+                                    <h3>@variant.CalculatedProductPrice.Price.ToString("C")</h3>
+                                    if (variant.CalculatedProductPrice.PercentOfSaving > 0)
+                                    {
+                                        <p class="product-price-regular">@variant.CalculatedProductPrice.OldPrice.Value.ToString("C")</p>
+                                        <p class="product-price-saving">You save (@(variant.CalculatedProductPrice.PercentOfSaving)%)</p>
+                                    }
                                 }
                             }
                         </div>
@@ -111,14 +121,22 @@
             }
             else
             {
+                <span class="label label-info">@Localizer["Foo"]</span>
                 <div class="product-price">
-                    @if (Model.IsCallForPricing)
+                    @if (@Model.IsCallForPricing)
                     {
                         <span class="label label-info">@Localizer["Call for pricing"]</span>
                     }
                     else
                     {
-                        <h3>@Model.CalculatedProductPrice.Price.ToString("C")</h3>
+                        @if (@Model.CalculatedProductPrice.Price == 0)
+                        {
+                            <h3>@Localizer["Free"]</h3>
+                        }
+                        else
+                        {
+                            <h3>@Model.CalculatedProductPrice.Price.ToString("C")</h3>
+                        }
                         if (Model.CalculatedProductPrice.PercentOfSaving > 0)
                         {
                             <p class="product-price-regular">@Model.CalculatedProductPrice.OldPrice.Value.ToString("C")</p>

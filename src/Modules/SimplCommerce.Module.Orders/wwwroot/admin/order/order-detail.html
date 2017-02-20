@@ -1,6 +1,6 @@
 ﻿<div class="panel panel-default">
     <div class="panel-heading">
-        <h2>Order deail: {{vm.order.id}}</h2>
+        <h2>Order detail: {{vm.order.id}}</h2>
     </div>
     <div class="panel-body">
         <h3>Order Information</h3>
@@ -8,7 +8,7 @@
             <dt>Order Id</dt>
             <dd>{{vm.order.id}}</dd>
             <dt>Created On</dt>
-            <dd>{{vm.order.createdOn}}</dd>
+            <dd>{{vm.order.createdOn | date:'EEE, MMM dd yyyy h:mm a'}}</dd>
             <dt>Customer Name</dt>
             <dd>{{vm.order.customerName}}</dd>
             <dt>Sub Total</dt>
@@ -43,6 +43,7 @@
             <thead>
             <tr>
                 <th colspan="2">Product</th>
+                <th>Date</th>
                 <th>Price</th>
                 <th>Quantity</th>
                 <th>Total</th>
@@ -59,6 +60,7 @@
                         </li>
                     </ul>
                 </td>
+                <td>{{item.productDateString}}</td>
                 <td>{{item.productPriceString}}</td>
                 <td>
                     <span>{{item.quantity}}</span>

@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using SimplCommerce.Module.Core.Models;
 using SimplCommerce.Module.Core.Services;
 using SimplCommerce.Module.Core.ViewModels;
+
 
 namespace SimplCommerce.Module.Core.Controllers
 {
@@ -12,11 +17,17 @@ namespace SimplCommerce.Module.Core.Controllers
     {
         private readonly ILogger _logger;
         private readonly IWidgetInstanceService _widgetInstanceService;
+        private readonly UserManager<User> _userManager;
 
-        public HomeController(ILoggerFactory factory, IWidgetInstanceService widgetInstanceService)
+        public HomeController(
+            ILoggerFactory factory,
+            IWidgetInstanceService widgetInstanceService,
+            UserManager<User> userManager
+            )
         {
             _logger = factory.CreateLogger("Unhandled Error");
             _widgetInstanceService = widgetInstanceService;
+            _userManager = userManager;
         }
 
         public IActionResult TestError()
@@ -24,7 +35,7 @@ namespace SimplCommerce.Module.Core.Controllers
             throw new Exception("Test behavior in case of error");
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             var model = new HomeViewModel();
 
@@ -39,6 +50,8 @@ namespace SimplCommerce.Module.Core.Controllers
                 HtmlData = x.HtmlData
             }).ToList();
 
+            model.Roles = await GetCurrentUserRolesAsync();
+            
             return View(model);
         }
 
@@ -65,5 +78,12 @@ namespace SimplCommerce.Module.Core.Controllers
 
             return View("Error");
         }
+
+        private async Task<IList<string>> GetCurrentUserRolesAsync()
+        {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            return (user == null ? new List<string>() : await _userManager.GetRolesAsync(user));
+        }
+        
     }
 }

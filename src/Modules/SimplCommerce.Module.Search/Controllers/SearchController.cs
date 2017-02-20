@@ -43,7 +43,7 @@ namespace SimplCommerce.Module.Search.Controllers
         [HttpGet("search")]
         public IActionResult Index(SearchOption searchOption)
         {
-            if (string.IsNullOrWhiteSpace(searchOption.Query))
+            if (string.IsNullOrWhiteSpace(searchOption.Query) || !ModelState.IsValid)
             {
                 return Redirect("~/");
             }
@@ -60,7 +60,21 @@ namespace SimplCommerce.Module.Search.Controllers
                 FilterOption = new FilterOption()
             };
 
-            var query = _productRepository.Query().Where(x => x.Name.Contains(searchOption.Query) && x.IsPublished && x.IsVisibleIndividually);
+            bool defDate = (searchOption.StartDate == new DateTime());
+
+            // search dates are always midnight-based, so for search purposes here, we make end date inclusive of entire day
+            DateTime endDate = searchOption.EndDate;
+            if(!defDate)
+            {
+                endDate = endDate.AddDays(1).AddSeconds(-1);
+            }
+
+            var query = (defDate ?
+                _productRepository.Query().Where(x => x.Name.ToLower().Contains(searchOption.Query.ToLower()) &&
+                    x.IsPublished && x.IsVisibleIndividually)
+                    :
+                _productRepository.Query().Where(x => x.Name.ToLower().Contains(searchOption.Query.ToLower()) &&
+                    x.IsPublished && x.IsVisibleIndividually && (x.UpdatedOn >= searchOption.StartDate && x.UpdatedOn <= endDate)));
 
             model.FilterOption.Price.MaxPrice = query.Max(x => x.Price);
             model.FilterOption.Price.MinPrice = query.Min(x => x.Price);
@@ -74,6 +88,9 @@ namespace SimplCommerce.Module.Search.Controllers
             {
                 query = query.Where(x => x.Price <= searchOption.MaxPrice.Value);
             }
+
+            model.CurrentSearchOption.StartDate = (defDate && query.Count() > 0 ? query.Min(x => x.UpdatedOn.DateTime.ToLocalTime()) : searchOption.StartDate);
+            model.CurrentSearchOption.EndDate = (defDate && query.Count() > 0 ? query.Max(x => x.UpdatedOn.DateTime.ToLocalTime()) : searchOption.EndDate);
 
             AppendFilterOptionsToModel(model, query);
             if (string.Compare(model.CurrentSearchOption.Category, "all", StringComparison.OrdinalIgnoreCase) != 0)
@@ -118,7 +135,8 @@ namespace SimplCommerce.Module.Search.Controllers
                     Price = x.Price,
                     OldPrice = x.OldPrice,
                     ThumbnailImage = x.ThumbnailImage,
-                    NumberVariation = x.ProductLinks.Count
+                    NumberVariation = x.ProductLinks.Count,
+                    UpdatedOn = x.UpdatedOn
                 })
                 .Skip(offset)
                 .Take(_pageSize)
@@ -142,6 +160,12 @@ namespace SimplCommerce.Module.Search.Controllers
             var sortBy = searchOption.Sort ?? string.Empty;
             switch (sortBy.ToLower())
             {
+                case "date-desc":
+                    query = query.OrderByDescending(x => x.UpdatedOn);
+                    break;
+                case "date-asc":
+                    query = query.OrderBy(x => x.UpdatedOn);
+                    break;
                 case "price-desc":
                     query = query.OrderByDescending(x => x.Price);
                     break;
